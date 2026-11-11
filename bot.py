@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from supabase import create_client
 from dotenv import load_dotenv
+from aiohttp import web  # این خط برای ساخت وب‌سرور رایگان در Render اضافه شده است
 
 # ================= تنظیمات =================
 load_dotenv()
@@ -301,9 +302,26 @@ async def cmd_setnick(message: types.Message):
     except:
         await message.reply("فرمت اشتباه است.")
 
-# ================= اجرای ربات =================
+# ================= وب سرور برای رندر =================
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get('/', handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    # رندر به صورت خودکار پورت را از متغیر محیطی می‌خواند، اما 8080 پیش‌فرض است
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+
+# ================= اجرای نهایی =================
 async def main():
     print("Bot is running...")
+    # اجرای وب سرور در پس‌زمینه
+    asyncio.create_task(start_web_server())
+    # اجرای ربات تلگرام
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
