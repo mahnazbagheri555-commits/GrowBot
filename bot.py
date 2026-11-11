@@ -312,7 +312,7 @@ async def start_web_server():
     runner = web.AppRunner(app)
     await runner.setup()
     # رندر به صورت خودکار پورت را از متغیر محیطی می‌خواند، اما 8080 پیش‌فرض است
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 7860))
     site = web.TCPSite(runner, '0.0.0.0', port)
     await site.start()
 
